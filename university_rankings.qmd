@@ -3,6 +3,7 @@ title: "University Rankings"
 format: 
   html:
     output-file: "index.html"
+    embed-resources: true
 editor: visual
 ---
 
@@ -55,8 +56,9 @@ plot(Berkeley$year,Berkeley$world_rank,
 ##Problem 5
 ```{r}
 library(dplyr)
+library(readr)
 top50<-df|>
-  mutate(rank_num=as.numeric(world_rank))|>
+  mutate(rank_num= parse_number(world_rank))|>
   filter( country=="United States of America", rank_num<=50)|>
   group_by(year)|>
   summarise(number_top50=n())
