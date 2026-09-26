@@ -1,0 +1,81 @@
+---
+title: "Lesson 6 Assignment"
+format: html
+editor: visual
+---
+
+```{r}
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(reactable)
+library(plotly)
+library(crosstalk)
+```
+
+
+## Problem 1A
+```{r}
+df<-read.csv("https://manctsui.github.io/datasets/timesData.csv")
+
+top3 <- df|>
+  count(country, sort=TRUE)|>
+  head(3)
+reactable(top3)
+```
+
+## Problem 1B
+```{r}
+ggplot(top3, aes(x=country, y=n))+geom_col()
+```
+
+##Problem 2A
+```{r}
+top50<-df|>
+  filter(year==2011)|>
+  mutate(rank =as.numeric(world_rank))|>
+  arrange(rank)|>
+  head(50)|>
+  mutate(rank= as.numeric(world_rank))|>
+  select(rank, university_name)
+reactable(top50)
+```
+
+
+##Problem 2B
+"No, because rank is not unique. Two or more university can have the same rank."
+
+
+##Problem 2C
+```{r}
+sd50<- SharedData$new(top50, key=~rank)
+filter_slider(
+  id= "rank_slider",
+  label= "University Rank",
+  sharedData = sd50,
+  column =~rank
+)
+reactable(sd50)
+```
+
+##Problem 3
+```{r}
+university2016<-df|>
+  filter(year==2016)|>
+  mutate(num_students=as.numeric(gsub(",", "", num_students)))
+sd2016 <- SharedData$new(university2016, key=~university_name)
+student<-plot_ly(sd2016,
+  x=~num_students,
+  y=~student_staff_ratio,
+  type= "scatter",
+  mode="markers"
+)
+teaching<-plot_ly(sd2016,
+  x=~student_staff_ratio,
+  y=~teaching,
+  type= "scatter",
+  mode="markers"
+)
+bscols(student,teaching)
+```
+
